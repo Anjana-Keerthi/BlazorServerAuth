@@ -1,0 +1,37 @@
+﻿@page "/"
+@inject IJSRuntime jsRuntime
+<PageTitle>Index</PageTitle>
+
+<AuthorizeView>
+    <Authorized>
+        <p> Hello @context.User.Identity.Name!!</p>
+    </Authorized>
+    <NotAuthorized>
+        <p> Hello Guest, To get more features.... LOGIN</p>
+    </NotAuthorized>
+</AuthorizeView>
+
+@*<h1>Hello, world!</h1>*@
+
+Welcome to your new app.
+
+<SurveyPrompt Title="How is Blazor working for you?" />
+
+<AuthorizeView>
+    <Authorized>
+        <br /><br />
+        <button class="btn btn-outline-primary" @onclick="ClickMe"> Click Me</button>
+    </Authorized>
+</AuthorizeView>
+
+
+@code{
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthStateProvider{ get; set; }
+
+    private async Task ClickMe()
+    {
+        var msg = $"Hello {AuthStateProvider.Result.User.Identity.Name}";
+        await jsRuntime.InvokeVoidAsync("alert", msg);
+    }
+}

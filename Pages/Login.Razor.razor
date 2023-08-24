@@ -1,0 +1,58 @@
+﻿@page "/login"
+
+@using ServerBlazorAuth.Authentication;
+@inject AccountService userAccountService
+@inject IJSRuntime jsRuntime
+@inject AuthenticationStateProvider authStateProvider
+@inject NavigationManager navManager
+
+<div class="row">
+    <div class="col-lg-4 offset-lg-4 pt-4 pb-4 border">
+        <div class="mb-3 text-center">
+            <h3>LOGIN</h3>
+        </div>
+        <div class="mb-3">
+            <label> UserName </label>
+            <input @bind="userModel.UserName" class="form-control" placeholder=" User Name" />
+        </div>
+
+        <div class="mb-3">
+            <label> Password </label>
+            <input @bind="userModel.Password" class="form-control" placeholder="password" />
+        </div>
+
+        <div class="mb-3 d-grid gap-2">
+            <button @onclick="UserAuthenticate" class="btn-primary"> Login</button>
+        </div>
+    </div>
+</div>
+
+@code
+{
+    private class User
+    {
+        public string UserName { get; set; }
+        public string Password { get; set; }
+    }
+
+    private User userModel = new User();
+
+    private async Task UserAuthenticate()
+    {
+        var userAccount = userAccountService.GetUser(userModel.UserName, userModel.Password);
+        if (userAccount == null)
+        {
+            await jsRuntime.InvokeVoidAsync("alert", "Invalid Credientals provided");
+            return;
+        }
+        var customAuthStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
+
+        customAuthStateProvider.UpdateUserAuthenticationState(new SessionStore
+            {
+                UserName = userAccount.UserName,
+                Role = userAccount.Role
+            });
+
+        navManager.NavigateTo("/", true);
+    }
+}

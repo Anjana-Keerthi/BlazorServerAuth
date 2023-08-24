@@ -1,0 +1,29 @@
+﻿@page "/counter"
+@attribute [Authorize(Roles = "Admin,User")]
+
+<PageTitle>Counter</PageTitle>
+
+<h1>Counter</h1>
+
+<p role="status">Current count: @currentCount</p>
+
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+
+
+@if (@AuthStateProvider.Result.User.IsInRole("Admin"))
+{
+    <FetchData></FetchData>
+}
+
+@code {
+    private int currentCount = 0;
+
+    private void IncrementCount()
+    {
+        currentCount++;
+    }
+
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthStateProvider { get; set; }
+
+}
